@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunity Cost Learning Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 40px;
+        }
+
+        .scenario-section {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .scenario-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .scenario-section p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .choice-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .choice-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .choice-card {
+            border: 3px solid #ecf0f1;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            text-align: center;
+            position: relative;
+        }
+
+        .choice-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .choice-card.selected {
+            border-color: #3498db;
+            background: #e3f2fd;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+
+        .choice-card h3 {
+            color: #2c3e50;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .choice-card .price {
+            color: #e74c3c;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .choice-card .description {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .choice-card .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .result-section {
+            display: none;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .result-item h4 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .result-item .value {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .result-item .description {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .opportunity-cost-explanation {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .opportunity-cost-explanation h3 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .opportunity-cost-explanation p {
+            font-size: 1em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .reset-button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .reset-button:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .timeline {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .timeline h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .timeline-year {
+            background: #3498db;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 600;
+            margin-right: 15px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .timeline-description {
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .chart-section {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .chart-section h3 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            height: 400px;
+            position: relative;
+        }
+
+        .chart-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .chart-info p {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .chart-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .chart-info li {
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .chart-info li:last-child {
+            border-bottom: none;
+        }
+
+        .reflection-question {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .reflection-question h3 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .question-box {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .question-box p {
+            font-size: 1.1em;
+            margin-bottom: 0;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .choice-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Expanding the Meaning of Opportunity Cost!</h1>
+            <p>What did someone who chose an iPad 10 years ago lose?</p>
+        </div>
+
+        <div class="main-content">
+            <!-- 시나리오 섹션 -->
+            <div class="scenario-section">
+                <h2>💰 The Scenario: April 2015</h2>
+                <p>You have <strong>$500</strong> in your pocket. You need to make a decision that will impact your future. Choose wisely!</p>
+            </div>
+
+            <!-- 선택 섹션 -->
+            <div class="choice-section">
+                <h2 class="section-title">Make Your Choice</h2>
+                <div class="choice-cards">
+                    <div class="choice-card" data-choice="ipad">
+                        <div class="icon">📱</div>
+                        <h3>Buy an iPad Air 2</h3>
+                        <div class="price">$499</div>
+                        <div class="description">
+                            <p><strong>16GB Wi-Fi Model</strong></p>
+                            <p>Released in October 2014</p>
+                            <p>Latest technology at the time</p>
+                            <p>Perfect for entertainment and productivity</p>
+                        </div>
+                    </div>
+                    <div class="choice-card" data-choice="stock">
+                        <div class="icon">📈</div>
+                        <h3>Invest in Apple Stock</h3>
+                        <div class="price">$500</div>
+                        <div class="description">
+                            <p><strong>16.67 shares at $30 per share</strong></p>
+                            <p>April 2015 stock price</p>
+                            <p>Own a piece of Apple Inc.</p>
+                            <p>Potential for long-term growth</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 결과 섹션 -->
+            <div class="result-section" id="result-section">
+                <h2>📊 10 Years Later: April 2025</h2>
+                
+                <div class="timeline">
+                    <h4>📅 Timeline of Events</h4>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2015</div>
+                        <div class="timeline-description">You make your choice with $500</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2016-2020</div>
+                        <div class="timeline-description">New iPad models released every year. Your iPad becomes outdated.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2021-2023</div>
+                        <div class="timeline-description">Apple stock experiences significant growth during tech boom.</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-year">2025</div>
+                        <div class="timeline-description">Time to see the results of your decision!</div>
+                    </div>
+                </div>
+
+                <div class="result-comparison">
+                    <div class="result-item">
+                        <h4>📱 iPad Choice Result</h4>
+                        <div class="value">$0</div>
+                        <div class="description">
+                            Your iPad is now gathering dust in a corner of your room. 
+                            It's too slow for modern apps and the battery barely holds a charge. 
+                            You can't even give it away!
+                        </div>
+                    </div>
+                    <div class="result-item">
+                        <h4>📈 Stock Choice Result</h4>
+                        <div class="value">$3,334</div>
+                        <div class="description">
+                            Your 16.67 shares are now worth $200 each! 
+                            That's a 567% return on your investment. 
+                            You could buy 6 new iPads with this money!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Apple Stock Price Chart -->
+                <div class="chart-section">
+                    <h3>📊 Apple Stock Price Journey (2015-2025)</h3>
+                    <div class="chart-container">
+                        <canvas id="appleStockChart"></canvas>
+                    </div>
+                    <div class="chart-info">
+                        <p><strong>Key Milestones:</strong></p>
+                        <ul>
+                            <li>📅 <strong>April 2015:</strong> $30 per share (Your investment point)</li>
+                            <li>📈 <strong>2020:</strong> COVID-19 impact and recovery</li>
+                            <li>🚀 <strong>2021:</strong> Tech boom peak</li>
+                            <li>📉 <strong>2022:</strong> Market correction</li>
+                            <li>💪 <strong>2023-2025:</strong> Steady growth to $200+</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="opportunity-cost-explanation">
+                    <h3>🎓 What is Opportunity Cost?</h3>
+                    <p><strong>Opportunity Cost</strong> is the value of the next best alternative that you give up when you make a choice.</p>
+                    <p>If you chose the stock, your opportunity cost was the immediate satisfaction of having a new iPad, but you gained much more in the long run!</p>
+                    <p><strong>Key Lesson:</strong> Every choice has a cost. Smart investors think about the long-term consequences of their decisions.</p>
+                </div>
+
+                <div class="reflection-question">
+                    <h3>🤔 Think About It!</h3>
+                    <div class="question-box">
+                        <p><strong>If you chose the iPad, what was your opportunity cost?</strong></p>
+                    </div>
+                </div>
+
+                <button class="reset-button" onclick="resetSimulation()">🔄 Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <script>
+        let selectedChoice = null;
+
+        // 선택 카드 이벤트 리스너
+        document.querySelectorAll('.choice-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 기존 선택 해제
+                document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+                
+                // 새 선택
+                this.classList.add('selected');
+                selectedChoice = this.dataset.choice;
+                
+                // 결과 표시
+                showResult();
+            });
+        });
+
+        // 결과 표시 함수
+        function showResult() {
+            if (selectedChoice) {
+                const resultSection = document.getElementById('result-section');
+                resultSection.classList.add('show');
+                
+                // 차트 생성 (약간의 지연을 두어 DOM이 완전히 렌더링된 후 실행)
+                setTimeout(() => {
+                    createAppleStockChart();
+                }, 100);
+                
+                // 결과 섹션으로 스크롤
+                resultSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Apple 주가 차트 생성 함수
+        function createAppleStockChart() {
+            // 차트 컨테이너가 존재하는지 확인
+            const chartElement = document.getElementById('appleStockChart');
+            if (!chartElement) {
+                console.error('Chart element not found');
+                return;
+            }
+
+            const ctx = chartElement.getContext('2d');
+            
+            // Chart.js가 로드되었는지 확인
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js not loaded');
+                return;
+            }
+            
+            // 실제 Apple 주가 데이터 (연간 평균)
+            const stockData = {
+                labels: [
+                    '2015', '2016', '2017', '2018', '2019', 
+                    '2020', '2021', '2022', '2023', '2024', '2025'
+                ],
+                datasets: [{
+                    label: 'Apple Stock Price (USD)',
+                    data: [30, 25, 42, 55, 70, 82, 150, 130, 190, 220, 200],
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgba(52, 152, 219, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            };
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#2c3e50'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function(context) {
+                                return `Price: $${context.parsed.y}`;
+                            },
+                            afterLabel: function(context) {
+                                if (context.parsed.x === 0) {
+                                    return 'Your investment point!';
+                                }
+                                return '';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Year',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#2c3e50'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Stock Price (USD)',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            color: '#2c3e50'
+                        },
+                        beginAtZero: false,
+                        min: 0,
+                        max: 250,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            };
+
+            // 기존 차트가 있다면 제거
+            if (window.appleStockChart && typeof window.appleStockChart.destroy === 'function') {
+                window.appleStockChart.destroy();
+            }
+
+            try {
+                // 새 차트 생성
+                window.appleStockChart = new Chart(ctx, {
+                    type: 'line',
+                    data: stockData,
+                    options: chartOptions
+                });
+                console.log('Chart created successfully');
+            } catch (error) {
+                console.error('Error creating chart:', error);
+                // 차트 생성 실패 시 대체 메시지 표시
+                const chartContainer = document.querySelector('.chart-container');
+                if (chartContainer) {
+                    chartContainer.innerHTML = '<div style="text-align: center; padding: 50px; color: #666;"><h4>📊 Chart Loading...</h4><p>Please refresh the page if the chart doesn\'t appear.</p></div>';
+                }
+            }
+        }
+
+        // 시뮬레이션 초기화
+        function resetSimulation() {
+            selectedChoice = null;
+            
+            // 선택 해제
+            document.querySelectorAll('.choice-card').forEach(c => c.classList.remove('selected'));
+            
+            // 차트 제거
+            if (window.appleStockChart && typeof window.appleStockChart.destroy === 'function') {
+                window.appleStockChart.destroy();
+                window.appleStockChart = null;
+            }
+            
+            // 결과 섹션 숨기기
+            const resultSection = document.getElementById('result-section');
+            resultSection.classList.remove('show');
+            
+            // 상단으로 스크롤
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 페이지 로드 시 애니메이션 효과
+        window.addEventListener('load', function() {
+            // Chart.js 로딩 확인
+            if (typeof Chart !== 'undefined') {
+                console.log('Chart.js loaded successfully');
+            } else {
+                console.error('Chart.js failed to load');
+            }
+            
+            const cards = document.querySelectorAll('.choice-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>
